@@ -103,11 +103,11 @@ def add_wish_list_func(user_id,product_id):
         product_id = int(product_id.strip())
         verify_product_id(product_id)
         user_id = int(user_id) 
-        
+
     except ValueError:
-        
+
         return jsonify("Error")
-    
+
     except Exception:
         print("I am here")
         return jsonify("Error")
@@ -115,9 +115,7 @@ def add_wish_list_func(user_id,product_id):
         product = (get_products_by_ids([product_id]))[0] #a single dictionary of product info 
         print(product)
         print(type(product_id))
-        wishlist_dict = {}
-        wishlist_dict['UserID'] = user_id
-        wishlist_dict['wishlist'] = product 
+        wishlist_dict = {'UserID': user_id, 'wishlist': product}
         ## { "UserId": number , "wishlist": { product info dictionary }}
         print(wishlist_dict)
 
@@ -341,10 +339,7 @@ def user_acc():
         name_user=user['Name_User'],
         email_address=user['Email_Address']
     )
-    if answer == True:
-        return user
-    else:
-        return jsonify(answer)
+    return user if answer == True else jsonify(answer)
 
 
 # deleting a user using the user id

@@ -121,7 +121,7 @@ def exception_handler(query, error_message):
         db_name = 'cfg_project'
         db_connection = _connect_to_db(db_name)
         cur = db_connection.cursor()
-        print("Connected to DB: %s" % db_name)
+        print(f"Connected to DB: {db_name}")
         cur.execute(query)
         db_connection.commit()
         cur.close()
@@ -168,7 +168,7 @@ def exception_handler_wish(query, error_message):
         db_name = 'cfg_project'
         db_connection = _connect_to_db(db_name)
         cur = db_connection.cursor()
-        print("Connected to DB: %s" % db_name)
+        print(f"Connected to DB: {db_name}")
         cur.execute(query)
         result = (cur.fetchall())
         wish = _map_values(result)
@@ -216,7 +216,7 @@ def exception_record_exists(query, error_message):
         db_name = 'cfg_project'
         db_connection = _connect_to_db(db_name)
         cur = db_connection.cursor()
-        print("Connected to DB: %s" % db_name)
+        print(f"Connected to DB: {db_name}")
         cur.execute(query)
         result = (cur.fetchall())
         row_count = cur.rowcount
@@ -247,33 +247,31 @@ def _map_values(result):
         function e.g. for retrieving a wishlist for a unique user - it will return the entire wishlist in the form of
         a list of dictionaries for that unique user.
     """
-    mapped = []
-    for item in result:
-        mapped.append(
-            {
-                "productID": item[0],
-                "code": item[1],
-                "product_name": item[2],
-                "ingredients_text": item[3],
-                "quantity": item[4],
-                "brands": item[5],
-                "brands_tags": item[6],
-                "categories": item[7],
-                "categories_tags": item[8],
-                "categories_en": item[9],
-                "countries": item[10],
-                "countries_tags": item[11],
-                "countries_en": item[12],
-                "image_url": item[13],
-                "image_small_url": item[14],
-                "image_ingredients_url": item[15],
-                "image_ingredients_small_url": item[16],
-                "image_nutrition_url": item[17],
-                "image_nutrition_small_url": item[18],
-                "User_ID": item[19],
-            }
-        )
-    return mapped
+    return [
+        {
+            "productID": item[0],
+            "code": item[1],
+            "product_name": item[2],
+            "ingredients_text": item[3],
+            "quantity": item[4],
+            "brands": item[5],
+            "brands_tags": item[6],
+            "categories": item[7],
+            "categories_tags": item[8],
+            "categories_en": item[9],
+            "countries": item[10],
+            "countries_tags": item[11],
+            "countries_en": item[12],
+            "image_url": item[13],
+            "image_small_url": item[14],
+            "image_ingredients_url": item[15],
+            "image_ingredients_small_url": item[16],
+            "image_nutrition_url": item[17],
+            "image_nutrition_small_url": item[18],
+            "User_ID": item[19],
+        }
+        for item in result
+    ]
 
 
 def add_wish_list(
@@ -470,16 +468,14 @@ def _get_wish_list_individual(UserID, ProductID):
         from the wishlist table in the MySQL database which will display the wishlist item for the user in a readable
         format.
     """
-    query = """ SELECT * FROM wish_list WHERE User_ID = {} AND productID = {} """.format(UserID, ProductID)
+    query = f""" SELECT * FROM wish_list WHERE User_ID = {UserID} AND productID = {ProductID} """
     error_message = "Failed to read data from DB"
     result = exception_handler_wish(query, error_message)
-    if result == []:
-        display_statement = "Wish list item for User_ID = {} and " \
-                            "productID = {} does not exist """.format(UserID, ProductID)
-        return display_statement
-    elif result != []:
-        return result
-    return
+    return (
+        f"Wish list item for User_ID = {UserID} and productID = {ProductID} does not exist "
+        if result == []
+        else result
+    )
 
 
 def _get_wish_list_all(UserID):
@@ -503,15 +499,10 @@ def _get_wish_list_all(UserID):
         from the wishlist table in the MySQL database which will display the entire wishlist for the user in a readable
         format.
     """
-    query = """ SELECT * FROM wish_list WHERE User_ID = {} """.format(UserID)
+    query = f""" SELECT * FROM wish_list WHERE User_ID = {UserID} """
     error_message = "Failed to read data from DB"
     result = exception_handler_wish(query, error_message)
-    if result == []:
-        display_statement = "Wish list User_ID = {} is empty """.format(UserID)
-        return display_statement
-    elif result != []:
-        return result
-    return
+    return f"Wish list User_ID = {UserID} is empty " if result == [] else result
 
 
 def delete_wishlist_item(UserID, ProductID):
@@ -539,21 +530,17 @@ def delete_wishlist_item(UserID, ProductID):
         of the command of deleting the wishlist item for that particular user from the wishlist table in the MySQL
         database which will present the deletion of the record for the user in a readable format.
     """
-    query = """ SELECT * FROM wish_list WHERE User_ID = {} AND productID = {} """.format(UserID, ProductID)
+    query = f""" SELECT * FROM wish_list WHERE User_ID = {UserID} AND productID = {ProductID} """
     error_message = "Error"
     row_count = exception_handler_wish(query, error_message)
     if row_count == []:
-        display_statement = ("Wishlist item for User_ID: {} and "
-                             "productID: {} does not exist").format(UserID, ProductID)
-    elif row_count != []:
-        query = """ DELETE FROM wish_list WHERE User_ID = {} AND productID = {} """.format(UserID, ProductID)
-        error_message = "Failed to read and subsequently delete data from DB"
-        exception_handler(query, error_message)
-        display_statement = (
-            "The wish list item for User ID: {} and  Product ID: {}, has now been deleted. "
-            "This wishlist record is now empty: {}".format(
-                UserID, ProductID, {}))
-    return display_statement
+        return f"Wishlist item for User_ID: {UserID} and productID: {ProductID} does not exist"
+    query = f""" DELETE FROM wish_list WHERE User_ID = {UserID} AND productID = {ProductID} """
+    exception_handler(query, "Failed to read and subsequently delete data from DB")
+    return (
+        "The wish list item for User ID: {} and  Product ID: {}, has now been deleted. "
+        "This wishlist record is now empty: {}".format(UserID, ProductID, {})
+    )
 
 
 def delete_wishlist(UserID):
@@ -577,21 +564,17 @@ def delete_wishlist(UserID):
         of the command of deleting the entire wishlist for that particular user from the wishlist table in the MySQL
         database which will present the deletion of the records for the user in a readable format.
     """
-    query = """ SELECT * FROM wish_list WHERE User_ID = {} """.format(UserID)
+    query = f""" SELECT * FROM wish_list WHERE User_ID = {UserID} """
     error_message = "Error"
     row_count = exception_handler_wish(query, error_message)
     if row_count == []:
-        display_statement = "Wishlist item for this User_ID: {} does not exist".format(UserID)
-    elif row_count != []:
-        query = """
+        return f"Wishlist item for this User_ID: {UserID} does not exist"
+    query = """
                 DELETE FROM wish_list 
                 WHERE User_ID = {} """.format(UserID)
 
-        error_message = "Failed to read and subsequently delete data from DB"
+    exception_handler(query, "Failed to read and subsequently delete data from DB")
 
-        exception_handler(query, error_message)
-
-        display_statement = (
-            "The entire wishlist for User ID: {}, has now been deleted. The wishlist is now empty as such: {}".format(
-                UserID, {}))
-    return display_statement
+    return "The entire wishlist for User ID: {}, has now been deleted. The wishlist is now empty as such: {}".format(
+        UserID, {}
+    )

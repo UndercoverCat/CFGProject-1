@@ -153,7 +153,7 @@ class TestWishListApiDb(unittest.TestCase):
         """
         self.UserID = 1500
         self.ProductID = 1500
-        expected = "Wish list item for User_ID = {} and productID = {} does not exist ".format(self.UserID, self.ProductID)
+        expected = f"Wish list item for User_ID = {self.UserID} and productID = {self.ProductID} does not exist "
         result = _get_wish_list_individual(self.UserID, self.ProductID)
         self.assertEqual(expected, result)
 
@@ -163,7 +163,7 @@ class TestWishListApiDb(unittest.TestCase):
         for a particular user, that does not exist so as to make sure the correct statement is printed back to the user
         """
         self.UserID = 1500
-        expected = "Wish list User_ID = {} is empty """.format(self.UserID)
+        expected = f"Wish list User_ID = {self.UserID} is empty "
         result = _get_wish_list_all(self.UserID)
         self.assertEqual(expected, result)
 
@@ -174,7 +174,7 @@ class TestWishListApiDb(unittest.TestCase):
         """
         self.UserID = 1500
         self.ProductID = 1500
-        expected = "Wishlist item for User_ID: {} and productID: {} does not exist".format(self.UserID, self.ProductID)
+        expected = f"Wishlist item for User_ID: {self.UserID} and productID: {self.ProductID} does not exist"
         result = delete_wishlist_item(self.UserID, self.ProductID)
         self.assertEqual(expected, result)
 
@@ -184,7 +184,7 @@ class TestWishListApiDb(unittest.TestCase):
         attempt to delete it, that does not exist so as to make sure the correct statement is printed back to the user
         """
         self.UserID = 1500
-        expected = "Wishlist item for this User_ID: {} does not exist".format(self.UserID)
+        expected = f"Wishlist item for this User_ID: {self.UserID} does not exist"
         result = delete_wishlist(self.UserID)
         self.assertEqual(expected, result)
 

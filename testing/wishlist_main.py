@@ -106,8 +106,7 @@ class MockFrontEnd:
             2 - string detailing why the product dictionary hasn't been retrieved
         """
         result = requests.get(
-            "http://127.0.0.1:5001/wishlist/{}/{}".format(User_ID, productID),
-            # headers restrict the type of data to be received
+            f"http://127.0.0.1:5001/wishlist/{User_ID}/{productID}",
             headers={"content-type": "application/json"},
         )
         return result.json()
@@ -128,7 +127,7 @@ class MockFrontEnd:
             2 - string returned for when wishlist is empty
         """
         result = requests.get(
-            "http://127.0.0.1:5001/wishlist/{}".format(User_ID),
+            f"http://127.0.0.1:5001/wishlist/{User_ID}",
             headers={"content-type": "application/json"},
         )
         return result.json()
@@ -148,7 +147,7 @@ class MockFrontEnd:
             string containig description of whether the item has been successfully deleted from the sql wish_list table or not
         """
         result = requests.get(
-            "http://127.0.0.1:5001/wishlist/delete/{}/{}".format(User_ID, productID),
+            f"http://127.0.0.1:5001/wishlist/delete/{User_ID}/{productID}",
             headers={"content-type": "application/json"},
         )
         return result.json()
@@ -166,7 +165,7 @@ class MockFrontEnd:
             string containig information detailing whether the wishlist has been deleted or if there is an issue deleting it
         """
         result = requests.get(
-            "http://127.0.0.1:5001/wishlist/delete/{}".format(User_ID),
+            f"http://127.0.0.1:5001/wishlist/delete/{User_ID}",
             headers={"content-type": "application/json"},
         )
         return result.json()

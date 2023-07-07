@@ -48,7 +48,7 @@ class dbConnection:
             print("MySQL Database Connection is Successful")
 
         except Error as er:
-            print("Error: '{}' ".format(er))
+            print(f"Error: '{er}' ")
 
     def _add_values(self, user_account):
         """
@@ -69,15 +69,15 @@ class dbConnection:
             Returns mapped values
                 List of dictionaries are returned with the user_account parameters
         """
-        mapped = []
-        for item in user_account:
-            mapped.append({
+        return [
+            {
                 "User_ID": item[0],
                 "User_Name": item[1],
                 "Name_User": item[2],
-                "Email_Address": item[3]
-            })
-        return mapped
+                "Email_Address": item[3],
+            }
+            for item in user_account
+        ]
 
     def verify_login(self, user_name, email_address):
         """
@@ -159,8 +159,7 @@ class dbConnection:
         """
         try:
             if '@' not in email_address or '.' not in email_address:
-                issue = 'Your email address has NOT been given in the requested format'  ### raises issue if email doesnt have @ or . in thr string
-                return issue
+                return 'Your email address has NOT been given in the requested format'
             answer = self.verify_login(user_name, email_address)
             if answer['verify'] == False:
                 self.conn()
@@ -205,7 +204,7 @@ class dbConnection:
         try:
             self.conn()
             cur = self.db.cursor()
-            cur.execute("SELECT * FROM user_info WHERE user_id = %s" % user_id)
+            cur.execute(f"SELECT * FROM user_info WHERE user_id = {user_id}")
             result = (cur.fetchall())
             for x in result:
                 print(x)
@@ -255,15 +254,17 @@ class dbConnection:
         try:
             self.conn()
             cur = self.db.cursor()
-            cur.execute("""SELECT user_name FROM user_info WHERE user_id=%s""" % user_id)
+            cur.execute(f"""SELECT user_name FROM user_info WHERE user_id={user_id}""")
             user = cur.fetchone()
-    
-            if user == None:
+
+            if user is None:
                 return Exception('No user with corresonding userID')
             elif user[0] == old_user_name:
                 # cur = self.db.cursor()
                 # # cur = self.db.cursor()
-                cur.execute("""UPDATE user_info SET user_name= '%s' WHERE user_id=%s""" % (new_user_name, user_id))
+                cur.execute(
+                    f"""UPDATE user_info SET user_name= '{new_user_name}' WHERE user_id={user_id}"""
+                )
                 self.db.commit()
                 print("The username has been updated")
                 result = True
@@ -309,11 +310,13 @@ class dbConnection:
         try:
             self.conn()
             cur = self.db.cursor()
-            cur.execute("""SELECT email_address FROM user_info WHERE user_id=%s""" % user_id)
+            cur.execute(f"""SELECT email_address FROM user_info WHERE user_id={user_id}""")
             email = cur.fetchone()
             print(email)
             if email[0] == old_email:
-                cur.execute("""UPDATE user_info SET email_address= '%s' WHERE user_id=%s""" % (new_email, user_id))
+                cur.execute(
+                    f"""UPDATE user_info SET email_address= '{new_email}' WHERE user_id={user_id}"""
+                )
                 self.db.commit()
                 print("The email address has been updated")
                 result = True
@@ -359,11 +362,13 @@ class dbConnection:
         try:
             self.conn()
             cur = self.db.cursor()
-            cur.execute("""SELECT name_user FROM user_info WHERE user_id=%s""" % user_id)
+            cur.execute(f"""SELECT name_user FROM user_info WHERE user_id={user_id}""")
             name = cur.fetchone()
             print(name)
             if name[0] == old_name:
-                cur.execute("""UPDATE user_info SET name_user= '%s' WHERE user_id=%s""" % (new_name, user_id))
+                cur.execute(
+                    f"""UPDATE user_info SET name_user= '{new_name}' WHERE user_id={user_id}"""
+                )
                 self.db.commit()
                 print("The name has been updated")
                 result = True
@@ -403,19 +408,19 @@ class dbConnection:
             self.conn()
             cur = self.db.cursor()
 
-            cur.execute("""DELETE FROM user_info WHERE user_id = {}""".format(user_id))
+            cur.execute(f"""DELETE FROM user_info WHERE user_id = {user_id}""")
 
             self.db.commit()
-            answer = "Account successfully deleted for username {}".format(user_name)
+            answer = f"Account successfully deleted for username {user_name}"
             cur.close()
 
         except UnboundLocalError as err:
-            return 'No entry in database corresponding to given user ID: {}'.format(user_id)
+            return f'No entry in database corresponding to given user ID: {user_id}'
         except Error as err:
             print("Failed to read data from Database", err)
             answer = err
         except Exception as err:
-            answer = "Unsuccessful deleting account for username {},{}".format(user_name, err)
+            answer = f"Unsuccessful deleting account for username {user_name},{err}"
         finally:
             if self.conn:
                 self.db.close()

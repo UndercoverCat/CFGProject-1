@@ -112,7 +112,7 @@ class TestApiDb(TestCase):
         """
         self.user_id_holly = self.db.get_user_id('Holly123','Holly','holly@gmail.com')
         result =  self.mock.delete_user_func(self.user_id_holly)
-        expected = "Account successfully deleted for username {}".format('Holly123')
+        expected = 'Account successfully deleted for username Holly123'
         self.assertEqual(expected,result)
         expected = []
         result =  self.mock.get_profile_by_id(self.user_id_holly)
@@ -226,7 +226,7 @@ class TestRunFunction(TestCase):
         Tests mock input for deleting a user with the API endpoints, checks account is deleted with string assertion
         """
         result = run()
-        self.assertEqual(result, 'Account successfully deleted for username {}'.format('annie20'))
+        self.assertEqual(result, 'Account successfully deleted for username annie20')
 
 
     @patch('builtins.input', side_effect = ['y','Ayesha11','Ayesha','ayesha@live.com'])
@@ -303,19 +303,19 @@ class TestUsersDelete(TestCase):
     def test_delete_zita_user(self):
         zita_id = self.db.get_user_id('zita123','zita','zita@gmail.com')
         result = self.mock.delete_user_func(zita_id)
-        expected = "Account successfully deleted for username {}".format('zita123')
+        expected = 'Account successfully deleted for username zita123'
         self.assertEqual(expected,result)
 
     def test_delete_fang_user(self):
         fang_id = self.db.get_user_id('fang123','Fang','fang@gmail.com')
         result = self.mock.delete_user_func(fang_id)
-        expected = "Account successfully deleted for username {}".format('fang123')
+        expected = 'Account successfully deleted for username fang123'
         self.assertEqual(expected,result)
 
     def test_delete_sophie_user(self):
         sophie_id = self.db.get_user_id('sophie1998','Sophie','sophie@hotmail.com')
         result = self.mock.delete_user_func(sophie_id)
-        expected = "Account successfully deleted for username {}".format('sophie1998')
+        expected = 'Account successfully deleted for username sophie1998'
         self.assertEqual(expected,result)
 
 
@@ -324,19 +324,19 @@ class TestUsersDelete(TestCase):
         print(ayesha_id)
         result = self.mock.delete_user_func(ayesha_id)
         print(result)
-        expected = "Account successfully deleted for username {}".format('Ayesha11')
+        expected = 'Account successfully deleted for username Ayesha11'
         self.assertEqual(expected,result)
 
     def test_delete_karma(self):
         karma_id = self.db.get_user_id('oranges','karma','karma@gmail.com')
         result = self.mock.delete_user_func(karma_id)
-        expected = "Account successfully deleted for username {}".format('oranges')
+        expected = 'Account successfully deleted for username oranges'
         self.assertEqual(expected,result)
 
     def test_delete_daisy(self):
         daisy_id = self.db.get_user_id('daisy123','daisy','daisy@live.com')
         result = self.mock.delete_user_func(daisy_id)
-        expected = "Account successfully deleted for username {}".format('daisy123')
+        expected = 'Account successfully deleted for username daisy123'
         self.assertEqual(expected,result)
 
     def test_delete_unknown_id(self):
