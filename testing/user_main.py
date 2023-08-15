@@ -72,9 +72,8 @@ class MockFrontEnd:
             empty if there is not corresponding user id
         """
         result = requests.get(
-            "http://127.0.0.1:5001/profile/{}".format(user_id),
-            headers = {"content_type": "application/json"},
-
+            f"http://127.0.0.1:5001/profile/{user_id}",
+            headers={"content_type": "application/json"},
         )
         #results = _map_values(result)
         return result.json()
@@ -135,8 +134,8 @@ class MockFrontEnd:
                     been removed.
         """
         result = requests.get(
-            "http://127.0.0.1:5001/delete/{}".format(user_id),
-            headers= {"content_type": "application/json"}
+            f"http://127.0.0.1:5001/delete/{user_id}",
+            headers={"content_type": "application/json"},
         )
         print(result)
         return result.json()
@@ -168,8 +167,8 @@ class MockFrontEnd:
         """
 
         result = requests.get(
-            "http://127.0.0.1:5001/login/{}/{}".format(user_name,email),
-            headers = {"content_type":"application/json"},
+            f"http://127.0.0.1:5001/login/{user_name}/{email}",
+            headers={"content_type": "application/json"},
         )
         return result.json()
 
@@ -196,8 +195,8 @@ class MockFrontEnd:
         """
 
         result = requests.get(
-            "http://127.0.0.1:5001/profile/change/{}/{}/{}".format(userID,prev_username,updated_username),
-            headers = {"content_type":"application/json"},
+            f"http://127.0.0.1:5001/profile/change/{userID}/{prev_username}/{updated_username}",
+            headers={"content_type": "application/json"},
         )
         return result.json()
 
@@ -220,8 +219,8 @@ class MockFrontEnd:
             return from change_user_email
         """
         result = requests.get(
-            "http://127.0.0.1:5001/profile/change/email/{}/{}/{}".format(userID,prev_email,updated_email),
-            headers = {"content_type":"application/json"},
+            f"http://127.0.0.1:5001/profile/change/email/{userID}/{prev_email}/{updated_email}",
+            headers={"content_type": "application/json"},
         )
         return result.json()
 
@@ -246,19 +245,19 @@ class MockFrontEnd:
         print()
         i = 0
         while i<=2:
-    
+
         ### put exception handling here!!!
             try:
                 answer = input('Would you like to make an account, y/n? ')
                 print(answer)
-                if answer != 'y' and answer !='n':
+                if answer not in ['y', 'n']:
                     raise Exception
             except:
                 print('Your answer has NOT been given in the requested format')
                 i+=1
 
             finally:
-                if answer == 'y' or answer=='n':
+                if answer in ['y', 'n']:
                     return answer
 
         answer = 'Too many tries inputting the incorrect format'
@@ -280,9 +279,7 @@ class MockFrontEnd:
         self.nameuser = input('Enter your name: ')
         self.emailaddress = input('Enter your email address: ')
 
-        result = self.add_new_user(self.username,self.nameuser,self.emailaddress)
-
-        return result
+        return self.add_new_user(self.username,self.nameuser,self.emailaddress)
 
     def verify_account_added(self):
         """
@@ -293,8 +290,7 @@ class MockFrontEnd:
             dict containing information about wether user added
         """
         self.user_id = self.db_utils.get_user_id(self.username,self.nameuser,self.emailaddress)
-        verify_account = self.user_login(self.username,self.emailaddress)
-        return verify_account
+        return self.user_login(self.username,self.emailaddress)
 
     def displaying_user(self):
         """
@@ -306,8 +302,7 @@ class MockFrontEnd:
             list of dictionary displaying user details
         """
         print('Account has been created successfully')
-        display_user_details = self.get_profile_by_id(self.user_id)  
-        return display_user_details
+        return self.get_profile_by_id(self.user_id)
 
     def deleting_account(self):
         """
@@ -330,16 +325,19 @@ class MockFrontEnd:
         """
         ans = input('Would you like to delete your account, y/n? ')
         try: 
-            if ans != 'y' and ans !='n':
+            if ans not in ['y', 'n']:
                 issue = 'Your answer has NOT been given in the requested format'
                 raise Exception(issue)
             elif ans == 'y':
                 result = self.delete_user_func(self.user_id)
-                if result == "Account successfully deleted for user {}".format(self.user_id):
+                if (
+                    result
+                    == f"Account successfully deleted for user {self.user_id}"
+                ):
                     print('Account successfully deleted') 
                     return 'Account successfully deleted'
 
-            elif ans == 'n':
+            else:
                 return ans
             return result
         except:
@@ -373,33 +371,25 @@ def run():
     ans = 'Issue with run function'
 
     answer = mock.welcome_message()
-    if answer == 'y':
-        try:
-            result = mock.enter_details()
-            print(result)
-            if isinstance(result,str):
-                return result
-            else:
-                verify_account = mock.verify_account_added()
-                print(verify_account)
-                if verify_account['verify'] == False:
-                    return 'Account has not been added to database'
-                    
-                else:
-                    user_details = mock.displaying_user()
-                    print(result)
-                    ans = mock.deleting_account()
-                    if ans == 'n':
-                        return result
-                    else:
-                        return ans
-
-        except Exception as err:
-            ans = err
-            return err
-
-    else:
+    if answer != 'y':
         return 'Goodbye!'
+    try:
+        result = mock.enter_details()
+        print(result)
+        if isinstance(result,str):
+            return result
+        verify_account = mock.verify_account_added()
+        print(verify_account)
+        if verify_account['verify'] == False:
+            return 'Account has not been added to database'
+
+        user_details = mock.displaying_user()
+        print(result)
+        ans = mock.deleting_account()
+        return result if ans == 'n' else ans
+    except Exception as err:
+        ans = err
+        return err
 
 
 if __name__ =='__main__':

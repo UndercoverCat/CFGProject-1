@@ -10,9 +10,7 @@ import pandas as pd
 
 def strip_list(l: list) -> list:
     """Strips unnecessary initial and final spaces in elements of a list"""
-    # List comprehension to strip useless spaces
-    _list = [x.strip(' ') for x in _list]
-    return _list
+    return [x.strip(' ') for x in _list]
 
 def string_to_list_strip(string: str) -> list:
     """Turns a string into a list and strips its elements trailing spaces"""
@@ -40,7 +38,7 @@ def df_func(df, col:str, new_col:str, function):
 
 def df_func_string_to_list_strip_lower(df,column:str):
     """Creates a new column as a list in lower case from a string column"""
-    column_list = column + '_list'
+    column_list = f'{column}_list'
     df_func(df, column, column_list, string_to_list_strip_lower)
 
 
@@ -76,15 +74,9 @@ def normalize_space(s):
 def boolean_df(item_lists, unique_items):
     """From Max Hildorf — Create a dataframe where rows stay the same as before, but where 
     every element of the list element is assigned its own column with a boolean in it"""
-    # Create empty dict
-    bool_dict = {}
-    
-    # Loop through all the list items
-    for i, item in enumerate(unique_items):
-        
-        # Apply boolean mask
-        bool_dict[item] = item_lists.apply(lambda x: item in x)
-            
+    bool_dict = {
+        item: item_lists.apply(lambda x: item in x) for item in unique_items
+    }
     # Return the results as a dataframe
     return pd.DataFrame(bool_dict)
 

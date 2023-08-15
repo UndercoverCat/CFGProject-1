@@ -164,10 +164,19 @@ class MockProductFrontEnd:
         list_products : list
             list of product dictionaries
         """
-        list_products = self.get_every_product(order = self.ordering,ingredient1= self.ingredientone,boolean1 = self.booleanone,
-        ingredient2 = self.ingredienttwo,boolean2 = self.booleantwo,ingredient3 = self.ingredientthree,boolean3 = self.booleanthree,
-        ingredient4 = self.ingredientfour,boolean4 = self.booleanfour,ingredient5= self.ingredientfive,boolean5 = self.booleanfive)
-        return list_products
+        return self.get_every_product(
+            order=self.ordering,
+            ingredient1=self.ingredientone,
+            boolean1=self.booleanone,
+            ingredient2=self.ingredienttwo,
+            boolean2=self.booleantwo,
+            ingredient3=self.ingredientthree,
+            boolean3=self.booleanthree,
+            ingredient4=self.ingredientfour,
+            boolean4=self.booleanfour,
+            ingredient5=self.ingredientfive,
+            boolean5=self.booleanfive,
+        )
 
     def results_again(self):
         """

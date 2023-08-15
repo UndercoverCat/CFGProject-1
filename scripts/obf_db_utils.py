@@ -50,14 +50,13 @@ def _connect_to_db(db_name):
     :param db_name: Products
     :return: connection cnx
     """
-    cnx = mysql.connector.connect(
+    return mysql.connector.connect(
         host=HOST,
         user=USER,
         password=PASSWORD,
-        auth_plugin="mysql_native_password", 
+        auth_plugin="mysql_native_password",
         database=db_name,
     )
-    return cnx
 
 
 # NEED CLARIFICATION:
@@ -77,32 +76,30 @@ def _map_values(result):
     /!\ Pay attention to match the order of the columns in the queries with this list!
     --> We chose to select all fields here: SELECT *
     """
-    mapped = []
-    for item in result:
-        mapped.append(
-            {
-               "productID": item[0],
-                "code": item[1],
-                "product_name": item[2],
-                "ingredients_text": item[3],
-                "brands": item[5],
-                "quantity": item[4],
-                "brands_tags": item[6],
-                "categories": item[7],   # CHECK ORDER!!!
-                "categories_tags": item[8],
-                "categories_en": item[9],
-                "countries": item[10],
-                "countries_tags": item[11],
-                "countries_en": item[12],
-                "image_url": item[13],
-                "image_small_url": item[14],
-                "image_ingredients_url": item[15],
-                "image_ingredients_small_url": item[16],
-                "image_nutrition_url": item[17],
-                "image_nutrition_small_url": item[18],
-            }
-        )
-    return mapped
+    return [
+        {
+            "productID": item[0],
+            "code": item[1],
+            "product_name": item[2],
+            "ingredients_text": item[3],
+            "brands": item[5],
+            "quantity": item[4],
+            "brands_tags": item[6],
+            "categories": item[7],  # CHECK ORDER!!!
+            "categories_tags": item[8],
+            "categories_en": item[9],
+            "countries": item[10],
+            "countries_tags": item[11],
+            "countries_en": item[12],
+            "image_url": item[13],
+            "image_small_url": item[14],
+            "image_ingredients_url": item[15],
+            "image_ingredients_small_url": item[16],
+            "image_nutrition_url": item[17],
+            "image_nutrition_small_url": item[18],
+        }
+        for item in result
+    ]
 
 # Replaced the DB name 'external_obf_testing' by 'Products'
 # to be consistent with the cosmo)_tables.sql DB file
@@ -110,7 +107,7 @@ def _map_values(result):
 # 1. One to get all the productID's corresponding to products containing an ingredient
 # 2. And the other that will get products based on their productID
 ## 4
-def exception_handler(query): 
+def exception_handler(query):
     """
     This function is the exception handler for exceptions that may arise when connecting
     to the database.
@@ -119,9 +116,9 @@ def exception_handler(query):
         db_name = "Products"
         db_connection = _connect_to_db(db_name)
         cur = db_connection.cursor()
-        print("Connected to DB: %s" % db_name)
+        print(f"Connected to DB: {db_name}")
 
-        cur.execute(query) 
+        cur.execute(query)
         result = (cur.fetchall())
         cur.close()
 
@@ -147,11 +144,7 @@ def _get_all_product_ids():
     SELECT productID
     FROM products_table"""
     query_result = exception_handler(query)
-    id_list = []
-    for element in query_result:
-        id_list.append(element[0]) # list of integers (productId's)
-    
-    return id_list    
+    return [element[0] for element in query_result]    
 
 # Replaced 'products1' by 'products_table' as in the cosmo_tables.sql DB file
 ## 3 / 3a
@@ -174,11 +167,7 @@ def get_productids_containing(ingredient, n=None):
                 ing=ingredient
             )
     query_result = exception_handler(query) # list of tuples     # 4
-    id_list = []
-    for element in query_result:
-        id_list.append(element[0]) # list of integers (productId's)
-    
-    return id_list
+    return [element[0] for element in query_result]
 
 
 ## 3b
@@ -201,10 +190,7 @@ def get_productids_ingt_in_nth_position(ingredient, n):
         )
 
     query_result = exception_handler(query)    # 4
-    id_list = []
-    for element in query_result:
-        id_list.append(element[0]) # list of integers (productID's)
-    return id_list
+    return [element[0] for element in query_result]
 
 
 ## 5
@@ -221,9 +207,9 @@ def get_products_by_ids(id_list):
         length = len(id_list)
         for i in range(length):
             if i < length-1:
-                form_tup_string += str(id_list[i]) + ","
+                form_tup_string += f"{str(id_list[i])},"
             else:
-                form_tup_string += str(id_list[i]) + ")"  
+                form_tup_string += f"{str(id_list[i])})"  
 
         query = """
                 SELECT * FROM products_table  --  what is products1? products_table?
@@ -254,17 +240,13 @@ def format_input(ingredients_input):
     for key,value in ingredients_input.items():
         ingredient,decision = value
         if ingredient: 
-            if decision:
-                tup = (ingredient.strip(), key)  
-                ingredients_output.append(tup)
-            else:
-                tup = (ingredient.strip(), '0') 
-                ingredients_output.append(tup)
+            tup = (ingredient.strip(), key) if decision else (ingredient.strip(), '0')
+            ingredients_output.append(tup)
     return ingredients_output 
 
 
 ## 2
-def get_products(output,search_func1,search_func2): #both functions have to do with getting Id's
+def get_products(output,search_func1,search_func2):    #both functions have to do with getting Id's
     """
     This function takes a list of productID's corresponding to the products that contain 
     ingredients you want to find (either unordered or in  specific positions) and include,
@@ -282,38 +264,32 @@ def get_products(output,search_func1,search_func2): #both functions have to do w
     exclude = []
     for pair in output:
         ingredient, n = pair
-        if ingredient == '':  
-            pass
-        else:
+        if ingredient != '':
             if n == '0':
             #    print("This is the ingredient we are searching",ingredient)
                 exclude_list = search_func1(ingredient) 
                 exclude.extend(exclude_list)  
-                
+
             else: 
                 include_list = search_func2(ingredient,n)  
                 include.append(include_list)
-    
-    if include == []:    ## sophie: added this if else so that the results can show if only excludes are entered in search
+
+    if not include:    ## sophie: added this if else so that the results can show if only excludes are entered in search
         include = _get_all_product_ids()   ## gets all product ids 
-        difference_exclude = list(set(include).difference(set(exclude)))   
+        difference_exclude = list(set(include).difference(set(exclude)))
     else:
 
         intersection_include = list(set.intersection(*map(set,include)))
         difference_exclude = list(set(intersection_include).difference(set(exclude)))
     try:
-        if len(difference_exclude) == 0:
+        if not difference_exclude:
             issue = 'Query returns no search results'
             return Exception(issue)
 
     except Exception as err:
         print('Error raised: ',err)
         return err
-    # print(difference_exclude)
-
-    list_dict_products = get_products_by_ids(difference_exclude)
-
-    return list_dict_products
+    return get_products_by_ids(difference_exclude)
 
 # So we need to make sure empty fields don't display null but maybe NotAvailable. 
 # We also need a function that pushes the products with a lot of null values to the bottom of the list being sent.
@@ -336,8 +312,7 @@ def display_less_null_values(input_list_dict_products):
     df = df.sort_values('null_count')
     df.fillna('NotAvailable',inplace=True)
     df.pop('null_count')
-    list_dict_products_sorted = df.to_dict(orient='records')
-    return list_dict_products_sorted
+    return df.to_dict(orient='records')
 
 ## 0
 def get_proper_ingredients_list(_dict):
@@ -419,7 +394,7 @@ def store_results(list_of_products):
         db_connection = _connect_to_db(db_name)
         cur = db_connection.cursor()
 
-        print("Connected to DB: %s" % db_name)
+        print(f"Connected to DB: {db_name}")
 
         query_update = """
         UPDATE search_results
@@ -502,11 +477,9 @@ def returning_products_in_pages(list_dict_products,page_number):
     if page_number<=total_pages:
         upper_page = page_number*25
         lower_page = upper_page-25
-        products_list = list_dict_products[lower_page:upper_page]
-        return products_list
+        return list_dict_products[lower_page:upper_page]
     else:
-        message = 'No more search results for this query'
-        return message
+        return 'No more search results for this query'
 
 
 def verify_product_id(product_id):
